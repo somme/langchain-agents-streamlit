@@ -1,6 +1,6 @@
 ### Requirements
 
-install poetry virtual enironment manager and package manager
+install poetry virtual environment manager and package manager
 
 ```angular2html
 curl -sSL https://install.python-poetry.org | python3 -
@@ -18,7 +18,7 @@ poetry install
 
 ### Run
 
-``` 
+```
 poetry shell
 
 streamlit run main.py
