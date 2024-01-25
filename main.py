@@ -1,11 +1,12 @@
+import streamlit as st
 import pandas as pd
 import os
-import streamlit as st
+
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 from langchain.agents.agent_types import AgentType
-
+from langchain_openai import ChatOpenAI
+from langchain_community.callbacks import StreamlitCallbackHandler
 
 def main():
     load_dotenv()
@@ -17,7 +18,7 @@ def main():
         print("OPENAI_API_KEY is set")
 
     st.set_page_config(page_title="Talk CSV to me")
-    st.header("Pandas Agents 🐼🕵️")
+    st.header("Agent Panda 🕵🐼️")
 
     csv_file = st.file_uploader("Upload a CSV file", type="csv")
 
@@ -25,20 +26,33 @@ def main():
 
         df = pd.read_csv(csv_file)
 
-        agent = create_pandas_dataframe_agent(
-            ChatOpenAI(temperature=0, model="gpt-3.5-turbo"),
-            df,
-            verbose=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS,
-            agent_executor_kwargs={"handle_parsing_errors": True}
-        )
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
-        user_question = st.text_input("Ask me a question about your CSV: ")
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
-        if user_question is not None and user_question != "":
-            with st.spinner(text="🐼 I'm thinking..."):
-                st.write(agent.run(user_question))
+        if prompt := st.chat_input("Ask me a question about your CSV"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
 
+            agent = create_pandas_dataframe_agent(
+                ChatOpenAI(temperature=0, model="gpt-3.5-turbo"),
+                df,
+                verbose=True,
+                agent_type=AgentType.OPENAI_FUNCTIONS,
+                reduce_k_below_max_tokens=True,
+                agent_executor_kwargs={"handle_parsing_errors": True}
+            )
+
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            with st.chat_message("assistant"):
+                callback = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+                response = agent.run(prompt, callbacks=[callback])
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                st.success(response)
 
 if __name__ == "__main__":
     main()
