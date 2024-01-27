@@ -2,18 +2,16 @@
 
 install poetry virtual environment manager and package manager
 
-```angular2html
+```
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 ### Setup
 
-```
 add .env with your OPENAI_API_KEY=XXX
-```
 
 ```
-poetry install
+poetry install --no-root
 ```
 
 ### Run
