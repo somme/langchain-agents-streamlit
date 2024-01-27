@@ -1,13 +1,13 @@
 Talk to your own CSV files
 ===============
 
-This is a simple app that allows you to talk to your own CSV files in a conversation.
-Uses Langchain, pandas dataframes, Streamlit and OpenAi.
+This is a conversational AI bot that allows you to talk to your own CSV files.
+Uses Langchain, pandas dataframes, agents, Streamlit and OpenAi.
 
-**Features**
+### Features
 
-* chat history
-* basic memory using `ConversationBufferWindowMemory`
+* Chat history
+* Basic memory using `ConversationBufferWindowMemory`
 
 ### Requirements
 
